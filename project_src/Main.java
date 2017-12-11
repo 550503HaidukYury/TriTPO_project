@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -11,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -34,6 +36,7 @@ public class Main extends Application {
     String mainStyle= new String("-fx-background-color:rgb(7, 142, 150)");
     String userStyle= new String("-fx-background-color:rgb(144, 144, 144)");
     String currStyle= new String();
+    Boolean editFl=false;
 
     final ObservableList<event> data = FXCollections.observableArrayList(
         new event("Jacob", "15","Smith", "jacob.smith@example.com"),
@@ -53,9 +56,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         StackPane mainPane = new StackPane();
         StackPane editPane = new StackPane();
-        mainWindow= new Scene(mainPane,450,500);
-        editWindow= new Scene(editPane,450,500);
-
+        mainWindow= new Scene(mainPane,400,500);
+        editWindow= new Scene(editPane,400,500);
+        primaryStage.setResizable(false);
 
         tableMainView.setEditable(false);
 
@@ -70,16 +73,19 @@ public class Main extends Application {
 
         TableColumn eventNameCol = new TableColumn("event_name");
         eventNameCol.setCellValueFactory(new PropertyValueFactory<event,String>("event_name"));
+        eventNameCol.setResizable(false);
 
         TableColumn dateCol = new TableColumn("date");
         dateCol.setCellValueFactory(new PropertyValueFactory<event,String>("date"));
+        dateCol.setResizable(false);
 
         TableColumn authorCol = new TableColumn("author");
         authorCol.setCellValueFactory(new PropertyValueFactory<event,String>("author"));
+        authorCol.setResizable(false);
 
         TableColumn textCol = new TableColumn("text");
         textCol.setCellValueFactory(new PropertyValueFactory<event,String>("text"));
-
+        tableMainView.setPrefWidth(300);
         tableMainView.getColumns().addAll(eventNameCol,dateCol,authorCol,textCol);
         tableMainView.setItems(data);
 
@@ -136,20 +142,18 @@ public class Main extends Application {
             addEvent(primaryStage);
         });
         backBtn.setOnAction(e -> {
-            if (!add_eventName.getText().trim().isEmpty()){
-                data.add(new event(
-                    add_eventName.getText(),
+            if (editFl){
+                data.add(new event(add_eventName.getText(),
                     add_Date.getText(),
                     add_author.getText(),
-                    add_text.getText()
-                ));
+                add_text.getText()));
                 add_eventName.clear();
                 add_Date.clear();
                 add_author.clear();
                 add_text.clear();
+                editFl=false;
             }
             primaryStage.setScene(mainWindow);
-
         });
         create_submitBtn.setOnAction(e-> {
                     data.add(new event(
@@ -169,6 +173,7 @@ public class Main extends Application {
         });
         editBtn.setOnAction(e->{
             if (!tableMainView.getSelectionModel().isEmpty()) {
+                editFl=true;
                 addEvent(primaryStage);
                 add_eventName.setText(tableMainView.getSelectionModel().getSelectedItem().getEvent_name());
                 add_Date.setText(tableMainView.getSelectionModel().getSelectedItem().getDate());
